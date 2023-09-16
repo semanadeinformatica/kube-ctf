@@ -2,7 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
 kube-janitor:
   quota:
     limits:
@@ -15,7 +14,6 @@ challenge-manager:
   replicas: 3
   authSecret: keyboard-cat
   containerSecret: keyboard-cat
-  registryPrefix: ghcr.io/downunderctf
   quota:
     limits:
       cpu: 500m
@@ -23,6 +21,9 @@ challenge-manager:
     requests:
       cpu: 125m
       memory: 256Mi
+
+  # Replace with your own registry so you can use "registry_prefix" as a variable in the challenge templates
+  registryPrefix: ghcr.io/downunderctf
 
 landing:
   replicas: 3
@@ -33,13 +34,14 @@ landing:
     requests:
       cpu: 50m
       memory: 256Mi
-      
+
 domain:
   challenges: chal.example.com
-  management: management.example.com
 
-# google project ID
-googleProject: example
+  # Domain name for the challenge-manager; it expects the host to start with challenge-manager.<domain>
+  # Using the cluster's internal DNS resolution we get this as a domain
+  # URL to use in CTFd: http://challenge-manager.kubectf-management.svc.cluster.local:3000
+  management: kubectf-management.svc.cluster.local
 
 cert:
   email: email@example.com
@@ -47,5 +49,5 @@ cert:
 
 # Don't change these unless you know what you're doing
 challengeNamespaces:
-- challenges
-- challenges-isolated
+  - challenges
+  - challenges-isolated

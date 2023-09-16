@@ -20,8 +20,8 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: web
-        image: landing # TODO: Change image
-        imagePullPolicy: IfNotPresent
+        image: landing # TODO: Change image name, maybe even add the registry prefix as a variable
+        imagePullPolicy: IfNotPresent # TODO: Remove policy to allow image updates from registry
         resources:
 {{ toYaml (index  .Values "landing").quota | indent 10 }}
         ports:
