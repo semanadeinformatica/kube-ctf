@@ -18,7 +18,8 @@ spec:
       serviceAccountName: challenge-manager
       containers:
       - name: challenge-manager
-        image: gcr.io/{{ .Values.googleProject }}/services/challenge-manager:latest
+        image: challenge-manager # TODO: Change image name
+        imagePullPolicy: IfNotPresent
         readinessProbe:
           httpGet:
             port: 3000
@@ -81,8 +82,8 @@ spec:
   entryPoints:
     - web
     - websecure
-  tls:
-    secretName: {{ .Release.Name }}-cert-management
+  # tls:
+  #   secretName: {{ .Release.Name }}-cert-management
   routes:
     - match: Host(`challenge-manager.{{ .Values.domain.management }}`)
       kind: Rule

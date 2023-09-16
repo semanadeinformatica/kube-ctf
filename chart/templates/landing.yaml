@@ -20,7 +20,8 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: web
-        image: gcr.io/{{ .Values.googleProject }}/services/landing:latest
+        image: landing # TODO: Change image
+        imagePullPolicy: IfNotPresent
         resources:
 {{ toYaml (index  .Values "landing").quota | indent 10 }}
         ports:
@@ -49,9 +50,9 @@ spec:
   entryPoints:
     - web
     - websecure
-  tls:
-    store:
-      name: {{ .Release.Name }}-cert-challenges
+  # tls:
+  #   store:
+  #     name: {{ .Release.Name }}-cert-challenges
   routes:
     - match: HostRegexp(`{{ .Values.domain.challenges }}`, `{subdomain:[\w-]+}.{{ .Values.domain.challenges }}`)
       kind: Rule
