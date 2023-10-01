@@ -2,6 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# One of "development" or "production"
+deployment-environment: development
+cluster-issuer-name: 
+
+# TODO: make it ignore the prefix if in development
+image-registry-prefix: 
+image-registry-credentials: 
+
 kube-janitor:
   quota:
     limits:
@@ -23,7 +31,7 @@ challenge-manager:
       memory: 256Mi
 
   # Replace with your own registry so you can use "registry_prefix" as a variable in the challenge templates
-  registryPrefix: ghcr.io/downunderctf
+  registryPrefix: 
 
 landing:
   replicas: 3
@@ -43,9 +51,7 @@ domain:
   # URL to use in CTFd: http://challenge-manager.kubectf-management.svc.cluster.local:3000
   management: kubectf-management.svc.cluster.local
 
-cert:
-  email: email@example.com
-  cfDNSToken: example
+
 
 # Don't change these unless you know what you're doing
 challengeNamespaces:

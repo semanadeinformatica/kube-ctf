@@ -1,7 +1,7 @@
 {{- $relname := .Release.Name -}}
 {{- range .Values.challengeNamespaces }}
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: hsts
@@ -24,14 +24,14 @@ spec:
 # spec:
 #   defaultCertificate:
 #     secretName: {{ .Release.Name }}-cert-challenges
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: hsts
-#   namespace: {{ .Release.Name }}-management
-# spec:
-#   headers:
-#     stsSeconds: 15552000
-#     forceSTSHeader: true
-#     stsIncludeSubdomains: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hsts
+  namespace: {{ .Release.Name }}-management
+spec:
+  headers:
+    stsSeconds: 15552000
+    forceSTSHeader: true
+    stsIncludeSubdomains: true

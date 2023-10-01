@@ -18,8 +18,10 @@ spec:
       serviceAccountName: challenge-manager
       containers:
       - name: challenge-manager
-        image: challenge-manager # TODO: Change image name, maybe even add the registry prefix as a variable
-        imagePullPolicy: IfNotPresent # TODO: Remove policy to allow image updates from registry
+        image: {{ (index  .Values "image-registry-prefix") }}challenge-manager
+{{- if eq (index  .Values "deployment-environment") "development" }}
+        imagePullPolicy: IfNotPresent
+{{- end}}
         readinessProbe:
           httpGet:
             port: 3000
@@ -57,6 +59,10 @@ spec:
 {{ toYaml (index  .Values "challenge-manager").quota | indent 10 }}
         ports:
         - containerPort: 3000
+{{- if (index .Values "image-registry-credentials") }}
+      imagePullSecrets:
+      - name: image-registry-credentials
+{{- end }}
 ---
 apiVersion: v1
 kind: Service

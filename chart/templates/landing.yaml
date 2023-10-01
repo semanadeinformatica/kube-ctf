@@ -20,12 +20,18 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: web
-        image: landing # TODO: Change image name, maybe even add the registry prefix as a variable
-        imagePullPolicy: IfNotPresent # TODO: Remove policy to allow image updates from registry
+        image: {{ (index  .Values "image-registry-prefix") }}landing
+{{- if eq (index  .Values "deployment-environment") "development" }}
+        imagePullPolicy: IfNotPresent
+{{- end}}
         resources:
 {{ toYaml (index  .Values "landing").quota | indent 10 }}
         ports:
         - containerPort: 80
+{{- if (index .Values "image-registry-credentials") }}
+      imagePullSecrets:
+      - name: image-registry-credentials
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -41,24 +47,52 @@ spec:
     - port: 80
 ---
 # default ingressroute
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: landing
+  name: landing-websecure
   namespace: {{ .Release.Name }}-challenges
 spec:
   entryPoints:
-    - web
     - websecure
-  # tls:
-  #   store:
-  #     name: {{ .Release.Name }}-cert-challenges
+{{- if eq (index  .Values "deployment-environment") "production" }}
+  tls:
+    secretName: {{ .Release.Name }}-cert-challenges
+{{- end }}
   routes:
     - match: HostRegexp(`{{ .Values.domain.challenges }}`, `{subdomain:[\w-]+}.{{ .Values.domain.challenges }}`)
       kind: Rule
-      priority: 1
+      priority: 5
       middlewares:
       - name: hsts
       services:
       - name: landing
         port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: http2https
+  namespace: {{ .Release.Name }}-challenges
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: landing-web
+  namespace: {{ .Release.Name }}-challenges
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: HostRegexp(`{{ .Values.domain.challenges }}`, `{subdomain:[\w-]+}.{{ .Values.domain.challenges }}`)
+      kind: Rule
+      priority: 5
+      services:
+      - name: noop@internal
+        kind: TraefikService
+      middlewares:
+      - name: http2https

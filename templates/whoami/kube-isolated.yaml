@@ -1,11 +1,11 @@
-
+# TODO: Update template
 apiVersion: kube-ctf.downunderctf.com/v1
 kind: IsolatedChallenge
 metadata:
   name: whoami
 spec:
   expires: 3600
-  available_at: 1600000000
+  available_at: 1600000000 # TODO: Change to day before CTF
   type: web
   template: |
     apiVersion: apps/v1
@@ -38,6 +38,7 @@ spec:
           enableServiceLinks: false
           automountServiceAccountToken: false
           containers:
+          # TODO: Replace by image of your choice and add imagePullSecrets if needed
           - name: web
             image: containous/whoami:latest 
             resources:
@@ -50,6 +51,8 @@ spec:
             ports:
             - containerPort: 80
               name: port-80
+          # imagePullSecrets:
+          # - name: image-registry-credentials
     ---
     apiVersion: v1
     kind: Service
@@ -71,7 +74,7 @@ spec:
         - port: 80
           name: port-80
     ---
-    apiVersion: traefik.containo.us/v1alpha1
+    apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
       name: ingress-ctf-{{ deployment_id }}
@@ -87,8 +90,8 @@ spec:
       entryPoints:
         - web
         - websecure
-      tls:
-        certResolver: default
+      tls: # Replace by certificate secret name
+        secretName: kubectf-cert-challenges-isolated
       routes:
         - match: Host(`{{ deployment_id }}.{{ domain }}`)
           kind: Rule
