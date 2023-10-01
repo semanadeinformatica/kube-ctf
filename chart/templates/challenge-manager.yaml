@@ -21,6 +21,8 @@ spec:
         image: {{ (index  .Values "image-registry-prefix") }}challenge-manager
 {{- if eq (index  .Values "deployment-environment") "development" }}
         imagePullPolicy: IfNotPresent
+{{- else }}
+        imagePullPolicy: Always
 {{- end}}
         readinessProbe:
           httpGet:
